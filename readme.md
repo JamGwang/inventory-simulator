@@ -14,6 +14,7 @@ https://drawsql.app/teams/sparta-28/diagrams/inventory-simulator
 캐릭터 정보 테이블 CharacterInfos
 
 --필수 기능 먼저 구현하기 위해 보류
+
 아이템 테이블 Items
 
 캐릭터-인벤토리 테이블 CharacterInventory
@@ -25,6 +26,20 @@ https://drawsql.app/teams/sparta-28/diagrams/inventory-simulator
 아이템은 여러 캐릭터가 장착하고 있을 수 있음 (CharacterItem : Items = N:M)
 
 2) API, 미들웨어
+
+## API명세서
+| 기능 | API URL | Method | Request | Response | 
+|:-:|:-:|:-:|:-:|:-:|
+|회원가입|/api/sign-up|POST|{<br>"id":"sparta75701",<br>	"password":"aaaa4321"<br>}|{<br>"message": "회원가입이 완료되었습니다."<br>}|  
+|로그인|/api/sign-in |POST| {<br>"id":"sparta75701",<br>	"password":"aaaa4321"<br>}|{<br>"message": "로그인 성공"<br>} | 
+|캐릭터 생성|/api/create-character|POST|{<br>"characterName":"EC2맨v"<br>}|{<br>"message": "EC2맨v 생성 완료 "<br>}| 
+|캐릭터 상세 조회 |/api/search-character/:characterId |GET |{} |{<br>"data": {	<br>"characterName":"EC2맨v"<br>,"characterInfos":<br> {"health": 500,<br>"power": 100}}<br>} | 
+|캐릭터 삭제|/api/search-character/:characterId|DELETE|{}|{<br>"data": "EC2맨v(이)가 삭제되었습니다."<br>} | 
+|아이템 생성|/api/create-item |POST|{<br>"item_name": "녹슨 검",<br>	"item_stat": {"power" : 2},<br>	"item_price":300<br>}|{<br>"data": <br>	{		"item_code": 2,	<br>		"item_name": "녹슨 검",	<br>		"item_stat": {			"power": 2		},<br>			"item_price": 300,	<br>		"characterInventoryId": null,<br>			"characterItemId": null	}<br>}| 
+|아이템 수정| /api/edit-item/:item_code |PATCH|{<br>"item_name": "녹슨 검 리뉴얼",<br>	"item_stat": {"power" : 10},<br>	"item_price":350<br>} |{<br>"message": "아이템 정보 변경에 성공하였습니다."<br>} | 
+|아이템 목록 조회|/api/items |GET |{} |{	<br>"data": [{	<br>		"item_code": 2,	<br>	"item_name": "녹슨 검 리뉴얼",	<br>	"item_price": 350	<br>},	<br>{"item_code": 1,	<br>"item_name": "철 검_리뉴얼",	<br>	"item_price": 500<br>}]<br>} | 
+|아이템 상세 조회|/api/items/:item_code  |GET |{} | {<br>	"data": [{<br>		"item_code": 2,	<br>"item_name": "녹슨 검 리뉴얼",<br>"item_stat": {"power": 10			},<br>			"item_price": 350		}<br>	]}<br>}| 
+
 
  /routes/user.router.js
 
@@ -38,17 +53,6 @@ https://drawsql.app/teams/sparta-28/diagrams/inventory-simulator
 - 전달 받은 id에 해당하는 사용자가 있는지 확인합니다.
 - 전달 받은 password와 데이터베이스의 저장된 password를 bcrypt를 이용하여 검증합니다.
 - 로그인에 성공한다면, 사용자에게 JWT를 발급합니다.
-
-사용자 인증 미들웨어 /middlewares/auth.middleware.js
-- 클라이언트로 부터 쿠키를 전달받습니다.
-- 쿠키가 Bearer 토큰 형식인지 확인합니다.
-- 서버에서 발급한JWT가 맞는지 검증합니다.
-- JWT의 userId를 이용해 사용자를 조회합니다.
-- req.user에 조회된 사용자 정보를 할당합니다.
-- 다음 미들웨어를 실행합니다.
-
-에러 처리 미들웨어 /middlewares/error-handling.middleware.js
-- 서버내부에서 에러발생 시 에러 메시지 전달
 
 /routes/characters.router.js
 
@@ -76,18 +80,28 @@ CharacterInfos테이블의 데이터를 반환합니다.
 - 동일한 item_name이 존재하는지 확인합니다
 - items 테이블에 아이템을 생성합니다.
 
-아이템 수정API /api/edit-item/:item_code
+아이템 수정API /api/edit-item/:item_code 
 - 수정할 아이템의 item_code를 url파라미터로 받고 수정할 정보들을 body로 전달 받습니다.
 - 해당 아이템의 내용을 수정합니다.
 
 아이템 목록조회 API /api/items
 - 모든 아이템의 내용을 출력하되, item_stat을 제외하고 출력합니다
 
-아이템 상세조회 API /api/items/:item_code
+아이템 상세조회 API /api/items/:item_code 
 - item_code를 파라미터로 받아 해당 item_code의 아이템 내용을 출력합니다.
+
+
+사용자 인증 미들웨어 /middlewares/auth.middleware.js
+- 클라이언트로 부터 쿠키를 전달받습니다.
+- 쿠키가 Bearer 토큰 형식인지 확인합니다.
+- 서버에서 발급한JWT가 맞는지 검증합니다.
+- JWT의 userId를 이용해 사용자를 조회합니다.
+- req.user에 조회된 사용자 정보를 할당합니다.
+- 다음 미들웨어를 실행합니다.
+
+에러 처리 미들웨어 /middlewares/error-handling.middleware.js
+- 서버내부에서 에러발생 시 에러 메시지 전달
+
 
 EC2배포
 도메인: spartatest7570.shop
-
-
-
