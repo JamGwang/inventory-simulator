@@ -82,10 +82,10 @@ CharacterInfos테이블의 데이터를 반환합니다.
 - 해당 아이템의 내용을 수정합니다.
 
 아이템 목록조회 API /api/items
--모든 아이템의 내용을 출력하되, item_stat을 제외하고 출력합니다
+- 모든 아이템의 내용을 출력하되, item_stat을 제외하고 출력합니다
 
 아이템 상세조회 API /api/items/:item_code
--item_code를 파라미터로 받아 해당 item_code의 아이템 내용을 출력합니다.
+- item_code를 파라미터로 받아 해당 item_code의 아이템 내용을 출력합니다.
 
 EC2배포
 도메인: spartatest7570.shop
