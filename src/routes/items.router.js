@@ -48,7 +48,7 @@ router.patch('/edit-item/:item_code', async (req, res, next) => {
                     where: {
                         item_code: item.item_code,
                     },
-                });                
+                });
             },
             {
                 isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
@@ -59,6 +59,41 @@ router.patch('/edit-item/:item_code', async (req, res, next) => {
     } catch (err) {
         next(err);
     }
+});
+
+
+//**아이템 목록 조회 API**/
+router.get('/items', async (req, res, next) => {
+    const items = await prisma.items.findMany({
+        select: {
+            item_code: true,
+            item_name: true,
+            item_price: true,
+        },
+        orderBy: {
+            item_code: 'desc'
+        }
+    });
+
+    return res.status(200).json({ data: items });
+});
+
+//**아이템 상세 조회 API**/
+router.get('/items/:item_code', async (req, res, next) => {
+    const {item_code} = req.params;
+    const items = await prisma.items.findMany({
+        where: {
+            item_code: +item_code
+        },
+        select: {
+            item_code: true,
+            item_name: true,
+            item_stat: true,
+            item_price: true,
+        }
+    });
+
+    return res.status(200).json({ data: items });
 });
 
 export default router;
