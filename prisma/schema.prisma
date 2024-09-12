@@ -1,0 +1,44 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  userId Int @id @default(autoincrement()) @map("userId")
+  id String @unique @map("id")
+  password String @map("password")
+
+  characters Characters[] //Characters 테이블과 관계 설정 1:N
+  @@map("Users")
+}
+
+model Characters {
+  characterId Int @id @default(autoincrement()) @map("characterId")
+  userId Int @map("userId") // 외래키
+  characterName String @unique @map("characterName")  
+
+  characterInfos CharacterInfos? //CharacterInfos 테이블과 1:1
+  user Users @relation(fields: [userId], references: [userId], onDelete: Cascade) // 유저 테이블과 관계 설정
+  @@map("Characters")
+}
+
+model CharacterInfos {
+  characterInfoId Int @id @default(autoincrement()) @map("characterInfoId")
+  characterId Int @unique @map("characterId") //외래키
+  health Int @default(500) @map("health")
+  power Int @default(100) @map("power")
+  money Int @default(10000) @map("money")
+
+  character Characters @relation(fields:[characterId], references:[characterId], onDelete: Cascade) //캐릭터 테이블과 관계 설정
+  @@map("CharacterInfos")
+}
