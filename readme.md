@@ -71,14 +71,24 @@ CharacterInfos테이블의 데이터를 반환합니다.
 - 사용자의 캐릭터인지 확인하고, 맞다면 캐릭터를 삭제합니다.
 
 /routes/items.router.js
+
 아이템 생성API /api/create-item
 - item_name, item_stat, item_price 를 body로 전달 받습니다.
 - 동일한 item_name이 존재하는지 확인합니다
 - items 테이블에 아이템을 생성합니다.
+
 아이템 수정API /api/edit-item/:item_code
 - 수정할 아이템의 item_code를 url파라미터로 받고 수정할 정보들을 body로 전달 받습니다.
 - 해당 아이템의 내용을 수정합니다.
 
-추가 예정*
-아이템 목록조회 API
-아이템 상세조회 API
+아이템 목록조회 API /api/items
+-모든 아이템의 내용을 출력하되, item_stat을 제외하고 출력합니다
+
+아이템 상세조회 API /api/items/:item_code
+-item_code를 파라미터로 받아 해당 item_code의 아이템 내용을 출력합니다.
+
+EC2배포
+도메인: spartatest7570.shop
+
+
+
