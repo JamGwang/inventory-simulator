@@ -1,6 +1,5 @@
 1. 데이터베이스 모델링
-2. 프로잭트 초기화 및 개발환경 설정
-3. API, 미들웨어 작성
+2. API, 미들웨어 작성
 
 
 1) 데이터 베이스 모델링
@@ -25,11 +24,10 @@ https://drawsql.app/teams/sparta-28/diagrams/inventory-simulator
 캐릭터의 장착아이템은 여러개일 수 있음
 아이템은 여러 캐릭터가 장착하고 있을 수 있음 (CharacterItem : Items = N:M)
 
-2) 개발환경
-라이브러리 - express, prisma, @prisma/client, cookie-parser, jsonwebtoken, bcrypt, dotenv
+2) API, 미들웨어
 
-3) API, 미들웨어 구현
  /routes/user.router.js
+
 회원가입 API /api/sign-up
 - id, password 를 body 로 전달받습니다.
 - 동일한 id를 가진 사용자가 있는지 확인합니다. (동일한 id가 존재하거나, password의 길이가 6미만일 경우 status401 반환 후 메시지 출력)
@@ -53,6 +51,7 @@ https://drawsql.app/teams/sparta-28/diagrams/inventory-simulator
 - 서버내부에서 에러발생 시 에러 메시지 전달
 
 /routes/characters.router.js
+
 캐릭터 생성 API /api/create-character
 - 캐릭터를 생성하려는 클라이언트가 로그인된 사용자인지 검증합니다.
 - characterName 을 body로 전달받습니다.
