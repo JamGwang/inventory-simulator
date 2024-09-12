@@ -1,37 +1,51 @@
 import express from 'express';
 import { prisma } from '../utils/prisma/index.js';
 import authMiddleware from '../middlewares/auth.middleware.js';
+import { Prisma } from '@prisma/client';
 
 const router = express.Router();
 
 /**캐릭터 생성 API**/
 router.post('/create-character', authMiddleware, async (req, res, next) => {
-    const { userId } = req.user;
-    const { characterName } = req.body;
-    const isExistCharacter = await prisma.characters.findFirst({
-        where: {
-            characterName,
-        },
-    });
+    try {
+        const { userId } = req.user;
+        const { characterName } = req.body;
+        const isExistCharacter = await prisma.characters.findFirst({
+            where: {
+                characterName,
+            },
+        });
 
-    if (isExistCharacter) {
-        return res.status(409).json({ message: '이미 존재하는 캐릭터명 입니다.' });
-    }
-    // Characters 테이블에 사용자를 추가합니다.
-    const character = await prisma.characters.create({
-        data: {
-            userId: +userId,
-            characterName
-        },
-    });
-    // CharacterInfos 테이블에 사용자 정보를 추가합니다.
-    const characterInfo = await prisma.characterInfos.create({
-        data: {
-            characterId: character.characterId, // 생성한 유저의 userId를 바탕으로 사용자 정보를 생성합니다.
+        if (isExistCharacter) {
+            return res.status(409).json({ message: '이미 존재하는 캐릭터명 입니다.' });
         }
-    });
 
-    return res.status(201).json({ message: character });
+        // 트랜잭션을 실행하고 트랜잭션 내부에서 캐릭터와 캐릭터 정보를 추가합니다
+        const [character, characterInfo] = await prisma.$transaction(
+            async (tx) => {
+                // Characters 테이블에 캐릭터를 추가합니다.    
+                const character = await tx.characters.create({
+                    data: {
+                        userId: +userId,
+                        characterName
+                    },
+                });
+                // CharacterInfos 테이블에 캐릭터 정보를 추가합니다.
+                const characterInfo = await tx.characterInfos.create({
+                    data: {
+                        characterId: character.characterId,
+                    }
+                });
+
+                return [character, characterInfo]
+            }, {
+            isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted
+        }
+        );
+        return res.status(201).json({ message: `${characterName} 생성 완료 ` });
+    } catch (err) {
+        next(err);
+    }
 });
 
 /** 캐릭터 조회 API **/

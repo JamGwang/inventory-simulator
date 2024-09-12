@@ -49,6 +49,9 @@ https://drawsql.app/teams/sparta-28/diagrams/inventory-simulator
 - req.user에 조회된 사용자 정보를 할당합니다.
 - 다음 미들웨어를 실행합니다.
 
+에러 처리 미들웨어 /middlewares/error-handling.middleware.js
+- 서버내부에서 에러발생 시 에러 메시지 전달
+
 /routes/characters.router.js
 캐릭터 생성 API /api/create-character
 - 캐릭터를 생성하려는 클라이언트가 로그인된 사용자인지 검증합니다.
